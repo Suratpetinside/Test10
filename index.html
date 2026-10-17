@@ -166,7 +166,7 @@
 
     </main>
 
-    <!-- Modal เพิ่ม/แก้ไขนัดหมาย -->
+    <!-- Modal เพิ่ม/แก้ไขนัดหมาย (รองรับช่องค้นหารายชื่อคนไข้แบบ Real-time) -->
     <div id="appointment-modal" class="fixed inset-0 bg-black/40 backdrop-blur-xs hidden items-center justify-center p-4 z-50">
         <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-xl border border-[#D8E6DD]">
             <div class="flex justify-between items-center mb-4">
@@ -175,16 +175,20 @@
             </div>
             <div class="space-y-4 text-sm">
                 <input type="hidden" id="editIndex" value="-1">
-                <div>
+                <input type="hidden" id="selectedPatientHN" value="">
+                <div class="relative">
                     <div class="flex justify-between items-center mb-1">
-                        <label class="block text-gray-600 text-xs font-medium">🐾 เลือกรายชื่อคนไข้ตาม HN</label>
+                        <label class="block text-gray-600 text-xs font-medium">🐾 ค้นหาและเลือกรายชื่อคนไข้ (HN / ชื่อสัตว์ / เจ้าของ)</label>
                         <button onclick="closeModal(); switchTab('patients'); openPatientModal();" class="text-[11px] text-[#2D6A4F] hover:underline font-semibold cursor-pointer">
-                            + เพิ่มรายชื่อใหม่ในระบบ
+                            + เพิ่มรายชื่อใหม่
                         </button>
                     </div>
-                    <select id="inputPatientSelect" class="w-full p-2.5 border border-[#D8E6DD] rounded-xl focus:outline-none focus:border-[#2D6A4F] bg-white text-[#1B4332] font-medium">
+                    <!-- ช่องพิมพ์ค้นหา -->
+                    <input type="text" id="patientSearchBox" onkeyup="filterPatientDropdown()" placeholder="พิมพ์ค้นหา เช่น 6910001 หรือ ชื่อสัตว์..." class="w-full p-2.5 border border-[#D8E6DD] rounded-xl focus:outline-none focus:border-[#2D6A4F] text-[#1B4332] bg-white text-sm">
+                    <!-- กล่อง Dropdown รายการผลลัพธ์ -->
+                    <div id="patientDropdownList" class="absolute left-0 right-0 mt-1 bg-white border border-[#D8E6DD] rounded-xl shadow-lg max-h-48 overflow-y-auto hidden z-20 divide-y divide-[#E9F2EC]">
                         <!-- โหลดผ่าน JS -->
-                    </select>
+                    </div>
                 </div>
                 <div>
                     <label class="block text-gray-600 text-xs mb-1 font-medium">📅 วันที่นัดหมาย</label>
@@ -234,16 +238,14 @@
         </div>
     </div>
 
-    <!-- Modal เพิ่ม/แก้ไขรายชื่อคนไข้ (ปรับขนาดพอดีจอ + มี Scrollbar สวยงาม) -->
+    <!-- Modal เพิ่ม/แก้ไขรายชื่อคนไข้ -->
     <div id="patient-modal" class="fixed inset-0 bg-black/40 backdrop-blur-xs hidden items-center justify-center p-3 z-50">
         <div class="bg-white rounded-2xl max-w-md w-full shadow-2xl border border-[#D8E6DD] flex flex-col max-h-[88vh] overflow-hidden">
-            <!-- Modal Header (Fixed) -->
             <div class="flex justify-between items-center px-6 py-4 border-b border-[#D8E6DD] bg-white sticky top-0 z-10">
                 <h3 id="patientModalTitle" class="font-bold text-base text-[#1B4332]">เพิ่มสมาชิกคนไข้ใหม่</h3>
                 <button onclick="closePatientModal()" class="text-gray-400 hover:text-gray-600 text-lg font-bold cursor-pointer">✕</button>
             </div>
             
-            <!-- Modal Body (Scrollable) -->
             <div class="p-6 space-y-4 text-sm overflow-y-auto flex-1">
                 <input type="hidden" id="editPatientIndex" value="-1">
                 <div>
@@ -352,12 +354,10 @@
                     </div>
                 </div>
 
-                <!-- ช่องเก็บค่า Base64 -->
                 <input type="hidden" id="inputPatientImgBase64" value="">
                 <input type="hidden" id="inputIDCardImgBase64" value="">
             </div>
 
-            <!-- Modal Footer (Fixed) -->
             <div class="px-6 py-3 border-t border-[#D8E6DD] bg-white flex justify-end gap-2 sticky bottom-0 z-10">
                 <button onclick="closePatientModal()" class="px-4 py-2 border border-[#D8E6DD] rounded-xl text-gray-600 hover:bg-gray-50 cursor-pointer text-sm">ยกเลิก</button>
                 <button onclick="savePatient()" class="px-5 py-2 bg-[#2D6A4F] text-white rounded-xl hover:bg-[#1B4332] shadow-sm cursor-pointer text-sm font-medium">บันทึกและสร้าง HN</button>
@@ -938,7 +938,54 @@
             }
         }
 
-        // --- ส่วนจัดการคิว ---
+        // --- ส่วนจัดการคิวและช่องค้นหาคนไข้แบบ Real-time ---
+        function filterPatientDropdown() {
+            let keyword = document.getElementById('patientSearchBox').value.toLowerCase();
+            let dropdown = document.getElementById('patientDropdownList');
+            dropdown.innerHTML = '';
+
+            let matched = patients.filter(p => 
+                p.hn.toLowerCase().includes(keyword) || 
+                p.name.toLowerCase().includes(keyword) || 
+                p.owner.toLowerCase().includes(keyword) ||
+                p.breed.toLowerCase().includes(keyword)
+            );
+
+            if (matched.length === 0) {
+                dropdown.innerHTML = `<div class="p-2.5 text-xs text-gray-400 text-center">ไม่พบรายชื่อคนไข้</div>`;
+                dropdown.classList.remove('hidden');
+                return;
+            }
+
+            matched.forEach(p => {
+                let div = document.createElement('div');
+                div.className = "p-2.5 hover:bg-[#E9F2EC] cursor-pointer text-xs text-[#1B4332] flex justify-between items-center transition";
+                div.innerHTML = `
+                    <div>
+                        <span class="font-bold text-red-600">[HN: ${p.hn}]</span> 
+                        <span class="font-semibold">${p.name}</span> (${p.species || 'สุนัข'}/${p.breed})
+                    </div>
+                    <div class="text-gray-500">เจ้าของ: ${p.owner}</div>
+                `;
+                div.onclick = () => {
+                    document.getElementById('patientSearchBox').value = `[HN: ${p.hn}] ${p.name} (${p.species || 'สุนัข'}/${p.breed}) - เจ้าของ: ${p.owner}`;
+                    document.getElementById('selectedPatientHN').value = p.hn;
+                    dropdown.classList.add('hidden');
+                };
+                dropdown.appendChild(div);
+            });
+            dropdown.classList.remove('hidden');
+        }
+
+        // ปิด Dropdown เมื่อคลิกข้างนอก
+        document.addEventListener('click', function(e) {
+            let box = document.getElementById('patientSearchBox');
+            let dropdown = document.getElementById('patientDropdownList');
+            if (box && dropdown && !box.contains(e.target) && !dropdown.contains(e.target)) {
+                dropdown.classList.add('hidden');
+            }
+        });
+
         function openAddModal() {
             if(patients.length === 0) {
                 alert('ยังไม่มีรายชื่อคนไข้ในระบบ! กรุณาเพิ่มข้อมูลคนไข้ก่อนสร้างนัดหมาย');
@@ -947,17 +994,12 @@
                 return;
             }
 
-            let selectEl = document.getElementById('inputPatientSelect');
-            selectEl.innerHTML = '';
-            patients.forEach(p => {
-                let opt = document.createElement('option');
-                opt.value = p.hn;
-                opt.innerText = `[HN: ${p.hn}] ${p.name} (${p.species || 'สุนัข'}/${p.breed}) - เจ้าของ: ${p.owner}`;
-                selectEl.appendChild(opt);
-            });
-
             document.getElementById('modalTitle').innerText = "เพิ่มนัดหมายใหม่ (เชื่อมโยง HN)";
             document.getElementById('editIndex').value = "-1";
+            document.getElementById('patientSearchBox').value = "";
+            document.getElementById('selectedPatientHN').value = "";
+            document.getElementById('patientDropdownList').classList.add('hidden');
+
             document.getElementById('inputDate').value = document.getElementById('filterDate').value;
             document.getElementById('inputTimeStart').value = "10:00";
             document.getElementById('inputTimeEnd').value = "11:00";
@@ -969,18 +1011,20 @@
 
         function openEditModal(index) {
             let item = appointments[index];
-            let selectEl = document.getElementById('inputPatientSelect');
-            selectEl.innerHTML = '';
-            patients.forEach(p => {
-                let opt = document.createElement('option');
-                opt.value = p.hn;
-                opt.innerText = `[HN: ${p.hn}] ${p.name} (${p.species || 'สุนัข'}/${p.breed}) - เจ้าของ: ${p.owner}`;
-                if(p.hn === item.hn) opt.selected = true;
-                selectEl.appendChild(opt);
-            });
+            let targetPatient = patients.find(p => p.hn === item.hn);
 
             document.getElementById('modalTitle').innerText = "แก้ไขข้อมูลนัดหมาย";
             document.getElementById('editIndex').value = index;
+            
+            if (targetPatient) {
+                document.getElementById('patientSearchBox').value = `[HN: ${targetPatient.hn}] ${targetPatient.name} (${targetPatient.species || 'สุนัข'}/${targetPatient.breed}) - เจ้าของ: ${targetPatient.owner}`;
+                document.getElementById('selectedPatientHN').value = targetPatient.hn;
+            } else {
+                document.getElementById('patientSearchBox').value = "";
+                document.getElementById('selectedPatientHN').value = item.hn;
+            }
+            document.getElementById('patientDropdownList').classList.add('hidden');
+
             document.getElementById('inputDate').value = item.date;
             
             let times = item.time.split('-');
@@ -1004,7 +1048,8 @@
 
         function saveAppointment() {
             let editIndex = parseInt(document.getElementById('editIndex').value);
-            let selectedHN = document.getElementById('inputPatientSelect').value;
+            let selectedHN = document.getElementById('selectedPatientHN').value;
+            let searchBoxVal = document.getElementById('patientSearchBox').value.trim();
             let date = document.getElementById('inputDate').value;
             let timeStart = document.getElementById('inputTimeStart').value;
             let timeEnd = document.getElementById('inputTimeEnd').value;
@@ -1012,8 +1057,14 @@
             let doctor = document.getElementById('inputDoctor').value;
             let status = document.getElementById('inputStatus').value;
 
+            // เผื่อกรณีพิมพ์ชื่อตรงๆ หรือไม่ได้กดเลือกจาก dropdown ให้พยายามแกะ HN ออกมาหรือตรวจสอบ
+            if (!selectedHN && searchBoxVal) {
+                let found = patients.find(p => searchBoxVal.includes(p.hn) || searchBoxVal.includes(p.name));
+                if (found) selectedHN = found.hn;
+            }
+
             if(!selectedHN || !date) {
-                alert('กรุณาเลือกคนไข้และวันที่นัดหมายให้ครบถ้วน');
+                alert('กรุณาเลือกหรือค้นหาคนไข้จากรายการให้ถูกต้องและระบุวันที่นัดหมาย');
                 return;
             }
 
