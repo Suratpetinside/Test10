@@ -129,7 +129,7 @@
             <div class="flex flex-col md:flex-row items-center justify-between gap-4 bg-white p-4 rounded-2xl shadow-sm border border-[#D8E6DD]">
                 <div class="relative w-full md:w-96">
                     <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 text-gray-400">🔍</span>
-                    <input type="text" id="searchPatientInput" onkeyup="renderPatientTable()" placeholder="ค้นหา HN / ชื่อสัตว์เลี้ยง / เจ้าของ / ตำบล / อำเภอ" class="w-full pl-10 pr-4 py-2.5 bg-[#F8FAF8] border border-[#D8E6DD] rounded-xl text-sm focus:outline-none focus:border-[#2D6A4F] text-[#1B4332]">
+                    <input type="text" id="searchPatientInput" onkeyup="renderPatientTable()" placeholder="ค้นหา HN / ชื่อสัตว์เลี้ยง / เจ้าของ / ที่อยู่" class="w-full pl-10 pr-4 py-2.5 bg-[#F8FAF8] border border-[#D8E6DD] rounded-xl text-sm focus:outline-none focus:border-[#2D6A4F] text-[#1B4332]">
                 </div>
                 <div class="flex items-center gap-3 w-full md:w-auto justify-end">
                     <button onclick="openPatientModal()" class="bg-[#2D6A4F] hover:bg-[#1B4332] text-white px-5 py-2.5 rounded-xl text-sm font-medium transition shadow-sm flex items-center gap-2 cursor-pointer">
@@ -149,7 +149,7 @@
                                 <th class="py-3.5 px-4 font-semibold">🔖 HN / ชื่อสัตว์เลี้ยง</th>
                                 <th class="py-3.5 px-4 font-semibold">📋 พันธุ์</th>
                                 <th class="py-3.5 px-4 font-semibold">👤 เจ้าของ / เบอร์โทร</th>
-                                <th class="py-3.5 px-4 font-semibold">📍 ที่อยู่ (ตำบล / อำเภอ)</th>
+                                <th class="py-3.5 px-4 font-semibold">📍 ที่อยู่ / รายละเอียด</th>
                                 <th class="py-3.5 px-4 font-semibold">🎂 อายุ</th>
                                 <th class="py-3.5 px-4 font-semibold">⚧ เพศ</th>
                                 <th class="py-3.5 px-4 font-semibold">⚖️ น้ำหนัก</th>
@@ -234,7 +234,7 @@
         </div>
     </div>
 
-    <!-- Modal เพิ่ม/แก้ไขรายชื่อคนไข้ (แยกส่วนรูปสัตว์เลี้ยง และ รูปบัตรประชาชนคนละบรรทัด) -->
+    <!-- Modal เพิ่ม/แก้ไขรายชื่อคนไข้ (เพิ่มช่องที่อยู่แบบกล่องยาวด้านล่างอำเภอ/ตำบล) -->
     <div id="patient-modal" class="fixed inset-0 bg-black/40 backdrop-blur-xs hidden items-center justify-center p-4 z-50 overflow-y-auto">
         <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-xl border border-[#D8E6DD] my-8">
             <div class="flex justify-between items-center mb-4">
@@ -276,6 +276,13 @@
                         <input type="text" id="inputPatientSubdistrict" placeholder="เช่น ต.ตลาด" class="w-full p-2.5 border border-[#D8E6DD] rounded-xl focus:outline-none focus:border-[#2D6A4F] text-[#1B4332]">
                     </div>
                 </div>
+
+                <!-- เพิ่มช่องที่อยู่ Box ยาวๆ ด้านล่างอำเภอและตำบล -->
+                <div>
+                    <label class="block text-gray-600 text-xs mb-1 font-medium">🏠 ที่อยู่ / รายละเอียด (บ้านเลขที่, ซอย, ถนน)</label>
+                    <textarea id="inputPatientAddressDetail" rows="2" placeholder="เช่น 99/1 ถ.หน้าเมือง" class="w-full p-2.5 border border-[#D8E6DD] rounded-xl focus:outline-none focus:border-[#2D6A4F] text-[#1B4332] resize-none"></textarea>
+                </div>
+
                 <div class="grid grid-cols-2 gap-3">
                     <div>
                         <label class="block text-gray-600 text-xs mb-1 font-medium">🎂 วันเกิดสัตว์เลี้ยง</label>
@@ -303,7 +310,6 @@
                         <input type="file" id="inputPatientFile" accept="image/*" class="w-full p-1.5 border border-[#D8E6DD] rounded-lg text-xs bg-white file:mr-2 file:py-1 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-[#2D6A4F] file:text-white hover:file:bg-[#1B4332] cursor-pointer">
                         <button type="button" onclick="togglePetCamera()" id="btnPetCam" class="px-3 py-1.5 bg-[#2D6A4F] hover:bg-[#1B4332] text-white rounded-lg text-xs font-medium transition cursor-pointer whitespace-nowrap">📷 เปิดกล้อง</button>
                     </div>
-                    <!-- กล้องถ่ายรูปสัตว์เลี้ยง -->
                     <div id="petCameraContainer" class="hidden flex flex-col items-center gap-2 pt-1">
                         <video id="petWebcamVideo" autoplay playsinline class="w-full h-36 bg-black rounded-lg object-cover border border-[#C8DCD0]"></video>
                         <button type="button" onclick="capturePetPhoto()" class="w-full py-1 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-medium cursor-pointer shadow-xs">📸 ถ่ายรูปสัตว์เลี้ยง</button>
@@ -322,7 +328,6 @@
                         <input type="file" id="inputIDCardFile" accept="image/*" class="w-full p-1.5 border border-[#D8E6DD] rounded-lg text-xs bg-white file:mr-2 file:py-1 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-[#2D6A4F] file:text-white hover:file:bg-[#1B4332] cursor-pointer">
                         <button type="button" onclick="toggleIDCamera()" id="btnIDCam" class="px-3 py-1.5 bg-[#2D6A4F] hover:bg-[#1B4332] text-white rounded-lg text-xs font-medium transition cursor-pointer whitespace-nowrap">📷 เปิดกล้อง</button>
                     </div>
-                    <!-- กล้องถ่ายรูปบัตรประชาชน -->
                     <div id="idCameraContainer" class="hidden flex flex-col items-center gap-2 pt-1">
                         <video id="idWebcamVideo" autoplay playsinline class="w-full h-36 bg-black rounded-lg object-cover border border-[#C8DCD0]"></video>
                         <button type="button" onclick="captureIDCardPhoto()" class="w-full py-1 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-medium cursor-pointer shadow-xs">📸 ถ่ายรูปบัตรประชาชน</button>
@@ -489,6 +494,7 @@
                 phone: "081-234-5678",
                 district: "อำเภอเมืองสุราษฎร์ธานี",
                 subdistrict: "ต.ตลาด",
+                addressDetail: "99/1 ถ.หน้าเมือง",
                 birthDate: "2023-10-15", 
                 gender: "ผู้ (ทำหมันแล้ว)", 
                 weight: "5.2 กก.",
@@ -506,6 +512,7 @@
                 phone: "089-999-8888",
                 district: "อำเภอพุนพิน",
                 subdistrict: "ต.ท่าข้าม",
+                addressDetail: "12/3 หมู่ 2",
                 birthDate: "2024-10-15", 
                 gender: "เมีย", 
                 weight: "3.8 กก.",
@@ -582,7 +589,8 @@
                 p.phone.includes(search) ||
                 p.hn.toLowerCase().includes(search) ||
                 (p.district && p.district.toLowerCase().includes(search)) ||
-                (p.subdistrict && p.subdistrict.toLowerCase().includes(search))
+                (p.subdistrict && p.subdistrict.toLowerCase().includes(search)) ||
+                (p.addressDetail && p.addressDetail.toLowerCase().includes(search))
             );
 
             if(filtered.length === 0) {
@@ -593,7 +601,7 @@
             filtered.forEach(p => {
                 let realIndex = patients.indexOf(p);
                 let computedAge = calculateAge(p.birthDate);
-                let fullAddress = `${p.subdistrict || ''} ${p.district || ''}`.trim() || 'อำเภอเมืองสุราษฎร์ธานี';
+                let fullAddress = `${p.addressDetail || ''} ${p.subdistrict || ''} ${p.district || ''}`.trim() || 'อำเภอเมืองสุราษฎร์ธานี';
 
                 let tr = document.createElement('tr');
                 tr.className = "hover:bg-[#F8FAF8] transition";
@@ -757,6 +765,7 @@
                 document.getElementById('inputPatientBreed').value = "";
                 document.getElementById('inputPatientOwner').value = "";
                 document.getElementById('inputPatientSubdistrict').value = "";
+                document.getElementById('inputPatientAddressDetail').value = "";
                 document.getElementById('inputPatientWeight').value = "";
                 document.getElementById('inputPatientBirthDate').value = getTodayDateString();
                 
@@ -775,6 +784,7 @@
                 document.getElementById('inputPatientOwner').value = `${p.owner} (${p.phone})`;
                 document.getElementById('inputPatientDistrict').value = p.district || "อำเภอเมืองสุราษฎร์ธานี";
                 document.getElementById('inputPatientSubdistrict').value = p.subdistrict || "";
+                document.getElementById('inputPatientAddressDetail').value = p.addressDetail || "";
                 document.getElementById('inputPatientBirthDate').value = p.birthDate;
                 document.getElementById('inputPatientGender').value = p.gender;
                 document.getElementById('inputPatientWeight').value = p.weight;
@@ -818,6 +828,7 @@
             let ownerFull = document.getElementById('inputPatientOwner').value.trim();
             let district = document.getElementById('inputPatientDistrict').value;
             let subdistrict = document.getElementById('inputPatientSubdistrict').value.trim();
+            let addressDetail = document.getElementById('inputPatientAddressDetail').value.trim();
             let birthDate = document.getElementById('inputPatientBirthDate').value;
             let gender = document.getElementById('inputPatientGender').value;
             let weight = document.getElementById('inputPatientWeight').value.trim();
@@ -844,6 +855,7 @@
                     phone: ownerPhone,
                     district: district,
                     subdistrict: subdistrict,
+                    addressDetail: addressDetail,
                     birthDate: birthDate,
                     gender: gender,
                     weight: weight,
@@ -859,6 +871,7 @@
                 p.phone = ownerPhone;
                 p.district = district;
                 p.subdistrict = subdistrict;
+                p.addressDetail = addressDetail;
                 p.birthDate = birthDate;
                 p.gender = gender;
                 p.weight = weight;
@@ -1074,8 +1087,8 @@
         function openDoctorLogModal(index) {
             let item = appointments[index];
             document.getElementById('docQueueIndex').value = index;
-            let patient = patients.find(p => p.hn === item.hn) || { name: '-', breed: '-', owner: '-', phone: '-', district: 'อำเภอเมืองสุราษฎร์ธานี', subdistrict: '', hn: item.hn, age: '1 ปี', gender: 'ผู้' };
-            let fullAddress = `${patient.subdistrict || ''} ${patient.district || ''}`.trim() || 'อำเภอเมืองสุราษฎร์ธานี';
+            let patient = patients.find(p => p.hn === item.hn) || { name: '-', breed: '-', owner: '-', phone: '-', district: 'อำเภอเมืองสุราษฎร์ธานี', subdistrict: '', addressDetail: '', hn: item.hn, age: '1 ปี', gender: 'ผู้' };
+            let fullAddress = `${patient.addressDetail || ''} ${patient.subdistrict || ''} ${patient.district || ''}`.trim() || 'อำเภอเมืองสุราษฎร์ธานี';
 
             document.getElementById('pOwner').innerText = patient.owner;
             document.getElementById('pPet').innerText = patient.name;
@@ -1135,7 +1148,7 @@
 
         function openHistoryModal(index) {
             let p = patients[index];
-            let fullAddress = `${p.subdistrict || ''} ${p.district || ''}`.trim() || 'อำเภอเมืองสุราษฎร์ธานี';
+            let fullAddress = `${p.addressDetail || ''} ${p.subdistrict || ''} ${p.district || ''}`.trim() || 'อำเภอเมืองสุราษฎร์ธานี';
 
             document.getElementById('historyPetImg').src = p.img;
             document.getElementById('historyPetName').innerText = `${p.name} (${p.breed}) [HN: ${p.hn}]`;
