@@ -234,14 +234,17 @@
         </div>
     </div>
 
-    <!-- Modal เพิ่ม/แก้ไขรายชื่อคนไข้ -->
-    <div id="patient-modal" class="fixed inset-0 bg-black/40 backdrop-blur-xs hidden items-center justify-center p-4 z-50 overflow-y-auto">
-        <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-xl border border-[#D8E6DD] my-8">
-            <div class="flex justify-between items-center mb-4">
-                <h3 id="patientModalTitle" class="font-bold text-lg text-[#1B4332]">เพิ่มสมาชิกคนไข้ใหม่</h3>
+    <!-- Modal เพิ่ม/แก้ไขรายชื่อคนไข้ (ปรับขนาดพอดีจอ + มี Scrollbar สวยงาม) -->
+    <div id="patient-modal" class="fixed inset-0 bg-black/40 backdrop-blur-xs hidden items-center justify-center p-3 z-50">
+        <div class="bg-white rounded-2xl max-w-md w-full shadow-2xl border border-[#D8E6DD] flex flex-col max-h-[88vh] overflow-hidden">
+            <!-- Modal Header (Fixed) -->
+            <div class="flex justify-between items-center px-6 py-4 border-b border-[#D8E6DD] bg-white sticky top-0 z-10">
+                <h3 id="patientModalTitle" class="font-bold text-base text-[#1B4332]">เพิ่มสมาชิกคนไข้ใหม่</h3>
                 <button onclick="closePatientModal()" class="text-gray-400 hover:text-gray-600 text-lg font-bold cursor-pointer">✕</button>
             </div>
-            <div class="space-y-4 text-sm">
+            
+            <!-- Modal Body (Scrollable) -->
+            <div class="p-6 space-y-4 text-sm overflow-y-auto flex-1">
                 <input type="hidden" id="editPatientIndex" value="-1">
                 <div>
                     <label class="block text-gray-600 text-xs mb-1 font-medium">🐾 ชนิดสัตว์</label>
@@ -261,7 +264,7 @@
                 </div>
                 <div>
                     <label class="block text-gray-600 text-xs mb-1 font-medium">📋 สายพันธุ์</label>
-                    <input type="text" id="inputPatientBreed" placeholder="เช่นฮอลแลนด์ลอป / ชิทู" class="w-full p-2.5 border border-[#D8E6DD] rounded-xl focus:outline-none focus:border-[#2D6A4F] text-[#1B4332]">
+                    <input type="text" id="inputPatientBreed" placeholder="เช่น ฮอลแลนด์ลอป / ชิทู" class="w-full p-2.5 border border-[#D8E6DD] rounded-xl focus:outline-none focus:border-[#2D6A4F] text-[#1B4332]">
                 </div>
                 <div>
                     <label class="block text-gray-600 text-xs mb-1 font-medium">👤 ชื่อเจ้าของ / เบอร์โทรศัพท์</label>
@@ -352,11 +355,12 @@
                 <!-- ช่องเก็บค่า Base64 -->
                 <input type="hidden" id="inputPatientImgBase64" value="">
                 <input type="hidden" id="inputIDCardImgBase64" value="">
+            </div>
 
-                <div class="pt-3 flex justify-end gap-2">
-                    <button onclick="closePatientModal()" class="px-4 py-2 border border-[#D8E6DD] rounded-xl text-gray-600 hover:bg-gray-50 cursor-pointer">ยกเลิก</button>
-                    <button onclick="savePatient()" class="px-5 py-2 bg-[#2D6A4F] text-white rounded-xl hover:bg-[#1B4332] shadow-sm cursor-pointer font-medium">บันทึกและสร้าง HN</button>
-                </div>
+            <!-- Modal Footer (Fixed) -->
+            <div class="px-6 py-3 border-t border-[#D8E6DD] bg-white flex justify-end gap-2 sticky bottom-0 z-10">
+                <button onclick="closePatientModal()" class="px-4 py-2 border border-[#D8E6DD] rounded-xl text-gray-600 hover:bg-gray-50 cursor-pointer text-sm">ยกเลิก</button>
+                <button onclick="savePatient()" class="px-5 py-2 bg-[#2D6A4F] text-white rounded-xl hover:bg-[#1B4332] shadow-sm cursor-pointer text-sm font-medium">บันทึกและสร้าง HN</button>
             </div>
         </div>
     </div>
@@ -500,7 +504,7 @@
                 img: "https://images.unsplash.com/photo-1543466835-00a7907e9de1?w=100&h=100&fit=crop", 
                 idCardImg: "",
                 name: "น้องหมีพู", 
-                breed: "ชิสุ", 
+                breed: "ชิทู", 
                 owner: "คุณสมชาย", 
                 phone: "081-234-5678",
                 district: "อำเภอเมืองสุราษฎร์ธานี",
@@ -1143,7 +1147,6 @@
             document.getElementById('pAddress').innerText = fullAddress;
             document.getElementById('pHN').innerText = patient.hn;
             
-            // แสดงชนิดสัตว์ในใบเวชระเบียนแบบไดนามิก (สุนัข, แมว หรือพิมพ์ระบุเอง เช่น กระต่าย)
             let sp = patient.species || 'สุนัข';
             document.getElementById('pSpeciesBox').innerText = sp;
 
