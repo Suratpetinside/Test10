@@ -129,7 +129,7 @@
             <div class="flex flex-col md:flex-row items-center justify-between gap-4 bg-white p-4 rounded-2xl shadow-sm border border-[#D8E6DD]">
                 <div class="relative w-full md:w-96">
                     <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 text-gray-400">🔍</span>
-                    <input type="text" id="searchPatientInput" onkeyup="renderPatientTable()" placeholder="ค้นหา HN / ชื่อสัตว์เลี้ยง / เจ้าของ / ที่อยู่" class="w-full pl-10 pr-4 py-2.5 bg-[#F8FAF8] border border-[#D8E6DD] rounded-xl text-sm focus:outline-none focus:border-[#2D6A4F] text-[#1B4332]">
+                    <input type="text" id="searchPatientInput" onkeyup="renderPatientTable()" placeholder="ค้นหา HN / ชนิด / ชื่อสัตว์เลี้ยง / เจ้าของ / ที่อยู่" class="w-full pl-10 pr-4 py-2.5 bg-[#F8FAF8] border border-[#D8E6DD] rounded-xl text-sm focus:outline-none focus:border-[#2D6A4F] text-[#1B4332]">
                 </div>
                 <div class="flex items-center gap-3 w-full md:w-auto justify-end">
                     <button onclick="openPatientModal()" class="bg-[#2D6A4F] hover:bg-[#1B4332] text-white px-5 py-2.5 rounded-xl text-sm font-medium transition shadow-sm flex items-center gap-2 cursor-pointer">
@@ -147,7 +147,7 @@
                             <tr class="bg-[#E9F2EC] text-[#1B4332] text-xs uppercase tracking-wider border-b border-[#D8E6DD]">
                                 <th class="py-3.5 px-4 font-semibold">📷 รูป</th>
                                 <th class="py-3.5 px-4 font-semibold">🔖 HN / ชื่อสัตว์เลี้ยง</th>
-                                <th class="py-3.5 px-4 font-semibold">📋 พันธุ์</th>
+                                <th class="py-3.5 px-4 font-semibold">📋 ชนิด / พันธุ์</th>
                                 <th class="py-3.5 px-4 font-semibold">👤 เจ้าของ / เบอร์โทร</th>
                                 <th class="py-3.5 px-4 font-semibold">📍 ที่อยู่ / รายละเอียด</th>
                                 <th class="py-3.5 px-4 font-semibold">🎂 อายุ</th>
@@ -244,22 +244,24 @@
             <div class="space-y-4 text-sm">
                 <input type="hidden" id="editPatientIndex" value="-1">
                 <div>
-                    <label class="block text-gray-600 text-xs mb-1 font-medium">🐾 ชื่อสัตว์เลี้ยง</label>
-                    <input type="text" id="inputPatientName" placeholder="เช่น น้องหมีพู" class="w-full p-2.5 border border-[#D8E6DD] rounded-xl focus:outline-none focus:border-[#2D6A4F] text-[#1B4332]">
-                </div>
-                
-                <!-- ชนิดสัตว์เลี้ยง (สุนัข / แมว) -->
-                <div>
-                    <label class="block text-gray-600 text-xs mb-1 font-medium">🏷️ ชนิดสัตว์</label>
-                    <select id="inputPatientSpecies" class="w-full p-2.5 border border-[#D8E6DD] rounded-xl focus:outline-none focus:border-[#2D6A4F] bg-white text-[#1B4332]">
+                    <label class="block text-gray-600 text-xs mb-1 font-medium">🐾 ชนิดสัตว์</label>
+                    <select id="inputPatientSpecies" onchange="checkSpeciesOther(this.value)" class="w-full p-2.5 border border-[#D8E6DD] rounded-xl focus:outline-none focus:border-[#2D6A4F] bg-white text-[#1B4332]">
                         <option value="สุนัข">สุนัข</option>
                         <option value="แมว">แมว</option>
+                        <option value="อื่นๆ">อื่นๆ (ระบุเอง)</option>
                     </select>
                 </div>
-
+                <div id="speciesOtherWrapper" class="hidden">
+                    <label class="block text-gray-600 text-xs mb-1 font-medium">✍️ ระบุชนิดสัตว์เลี้ยงอื่นๆ</label>
+                    <input type="text" id="inputPatientSpeciesOther" placeholder="เช่น กระต่าย, ชูเกอร์ไกลเดอร์" class="w-full p-2.5 border border-[#D8E6DD] rounded-xl focus:outline-none focus:border-[#2D6A4F] text-[#1B4332]">
+                </div>
+                <div>
+                    <label class="block text-gray-600 text-xs mb-1 font-medium">🐾 ชื่อสัตว์เลี้ยง</label>
+                    <input type="text" id="inputPatientName" placeholder="เช่น น้องบุ่นปุ่น" class="w-full p-2.5 border border-[#D8E6DD] rounded-xl focus:outline-none focus:border-[#2D6A4F] text-[#1B4332]">
+                </div>
                 <div>
                     <label class="block text-gray-600 text-xs mb-1 font-medium">📋 สายพันธุ์</label>
-                    <input type="text" id="inputPatientBreed" placeholder="เช่น ชิทู / เปอร์เซีย" class="w-full p-2.5 border border-[#D8E6DD] rounded-xl focus:outline-none focus:border-[#2D6A4F] text-[#1B4332]">
+                    <input type="text" id="inputPatientBreed" placeholder="เช่นฮอลแลนด์ลอป / ชิทู" class="w-full p-2.5 border border-[#D8E6DD] rounded-xl focus:outline-none focus:border-[#2D6A4F] text-[#1B4332]">
                 </div>
                 <div>
                     <label class="block text-gray-600 text-xs mb-1 font-medium">👤 ชื่อเจ้าของ / เบอร์โทรศัพท์</label>
@@ -308,7 +310,7 @@
                 </div>
                 <div>
                     <label class="block text-gray-600 text-xs mb-1 font-medium">⚖️ น้ำหนัก</label>
-                    <input type="text" id="inputPatientWeight" placeholder="เช่น 5.2 กก." class="w-full p-2.5 border border-[#D8E6DD] rounded-xl focus:outline-none focus:border-[#2D6A4F] text-[#1B4332]">
+                    <input type="text" id="inputPatientWeight" placeholder="เช่น 1.5 กก." class="w-full p-2.5 border border-[#D8E6DD] rounded-xl focus:outline-none focus:border-[#2D6A4F] text-[#1B4332]">
                 </div>
 
                 <!-- 🐾 รูปภาพสัตว์เลี้ยง -->
@@ -347,6 +349,7 @@
                     </div>
                 </div>
 
+                <!-- ช่องเก็บค่า Base64 -->
                 <input type="hidden" id="inputPatientImgBase64" value="">
                 <input type="hidden" id="inputIDCardImgBase64" value="">
 
@@ -420,15 +423,12 @@
                     </div>
                     <div class="flex justify-between pt-0.5">
                         <div class="w-2/5">HN: <span id="pHN" class="font-semibold text-red-600">-</span></div>
-                        <div class="w-3/5">น้ำหนัก (Weight): <span id="pWeight" class="font-semibold text-[#2D6A4F]">-</span></div>
                     </div>
                 </div>
-
-                <!-- ตารางแสดงชนิดสัตว์ที่เลือกจากฐานข้อมูลคนไข้ -->
                 <div class="border border-black grid grid-cols-5 text-center text-[11px] divide-x divide-black">
                     <div class="p-1">
                         <div class="font-bold border-b border-black pb-0.5">ชนิด (Species)</div>
-                        <div id="pSpeciesCheck" class="p-1 text-left font-medium">☑ สุนัข ☐ แมว</div>
+                        <div id="pSpeciesBox" class="p-1 text-left font-semibold text-emerald-900">-</div>
                     </div>
                     <div class="p-1">
                         <div class="font-bold border-b border-black pb-0.5">พันธุ์ (Breed)</div>
@@ -447,7 +447,6 @@
                         <div id="pDoctor" class="p-1 font-semibold">-</div>
                     </div>
                 </div>
-
                 <div class="border border-black rounded-lg overflow-hidden">
                     <div class="bg-gray-100 font-bold text-center border-b border-black py-1.5 text-[11px]">ประวัติสัตว์ป่วย (Patient History)</div>
                     <div class="grid grid-cols-11 border-b border-black text-center font-bold text-[10px] bg-gray-50">
@@ -497,11 +496,11 @@
         let patients = [
             { 
                 hn: "6910001",
+                species: "สุนัข",
                 img: "https://images.unsplash.com/photo-1543466835-00a7907e9de1?w=100&h=100&fit=crop", 
                 idCardImg: "",
                 name: "น้องหมีพู", 
-                species: "สุนัข",
-                breed: "ชิทู", 
+                breed: "ชิสุ", 
                 owner: "คุณสมชาย", 
                 phone: "081-234-5678",
                 district: "อำเภอเมืองสุราษฎร์ธานี",
@@ -516,10 +515,10 @@
             },
             { 
                 hn: "6910002",
+                species: "แมว",
                 img: "https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?w=100&h=100&fit=crop", 
                 idCardImg: "",
                 name: "น้องทองกวาว", 
-                species: "แมว",
                 breed: "เปอร์เซีย", 
                 owner: "คุณหญิง", 
                 phone: "089-999-8888",
@@ -590,6 +589,16 @@
             return `${years} ปี ${months} เดือน`;
         }
 
+        function checkSpeciesOther(val) {
+            const wrapper = document.getElementById('speciesOtherWrapper');
+            if (val === 'อื่นๆ') {
+                wrapper.classList.remove('hidden');
+            } else {
+                wrapper.classList.add('hidden');
+                document.getElementById('inputPatientSpeciesOther').value = '';
+            }
+        }
+
         function renderPatientTable() {
             const tbody = document.getElementById('patientTableBody');
             const search = document.getElementById('searchPatientInput').value.toLowerCase();
@@ -622,10 +631,13 @@
                 tr.innerHTML = `
                     <td class="py-3.5 px-4"><img src="${p.img}" alt="${p.name}" class="w-10 h-10 rounded-full object-cover border border-[#C8DCD0] shadow-xs"></td>
                     <td class="py-3.5 px-4">
-                        <div class="font-bold text-[#1B4332]">${p.name} <span class="text-xs text-gray-500 font-normal">(${p.species || 'สุนัข'})</span></div>
+                        <div class="font-bold text-[#1B4332]">${p.name}</div>
                         <div class="text-[11px] text-red-600 font-bold">HN: ${p.hn}</div>
                     </td>
-                    <td class="py-3.5 px-4 text-gray-600">${p.breed}</td>
+                    <td class="py-3.5 px-4">
+                        <span class="font-medium text-[#2D6A4F]">${p.species || 'สุนัข'}</span>
+                        <div class="text-gray-500 text-xs">${p.breed}</div>
+                    </td>
                     <td class="py-3.5 px-4 text-gray-600">${p.owner} (${p.phone})</td>
                     <td class="py-3.5 px-4 font-medium text-emerald-800">${fullAddress}</td>
                     <td class="py-3.5 px-4 text-[#2D6A4F] font-medium">${computedAge}</td>
@@ -775,8 +787,10 @@
 
             if(index === -1) {
                 document.getElementById('patientModalTitle').innerText = "เพิ่มสมาชิกคนไข้ใหม่ (สร้าง HN อัตโนมัติ YYMMXXX)";
-                document.getElementById('inputPatientName').value = "";
                 document.getElementById('inputPatientSpecies').value = "สุนัข";
+                document.getElementById('speciesOtherWrapper').classList.add('hidden');
+                document.getElementById('inputPatientSpeciesOther').value = "";
+                document.getElementById('inputPatientName').value = "";
                 document.getElementById('inputPatientBreed').value = "";
                 document.getElementById('inputPatientOwner').value = "";
                 document.getElementById('inputPatientSubdistrict').value = "";
@@ -794,8 +808,19 @@
             } else {
                 let p = patients[index];
                 document.getElementById('patientModalTitle').innerText = `แก้ไขข้อมูลคนไข้ [HN: ${p.hn}]`;
+                
+                let isStandardSpecies = (p.species === 'สุนัข' || p.species === 'แมว');
+                if (isStandardSpecies) {
+                    document.getElementById('inputPatientSpecies').value = p.species;
+                    document.getElementById('speciesOtherWrapper').classList.add('hidden');
+                    document.getElementById('inputPatientSpeciesOther').value = "";
+                } else {
+                    document.getElementById('inputPatientSpecies').value = 'อื่นๆ';
+                    document.getElementById('speciesOtherWrapper').classList.remove('hidden');
+                    document.getElementById('inputPatientSpeciesOther').value = p.species || "";
+                }
+
                 document.getElementById('inputPatientName').value = p.name;
-                document.getElementById('inputPatientSpecies').value = p.species || "สุนัข";
                 document.getElementById('inputPatientBreed').value = p.breed;
                 document.getElementById('inputPatientOwner').value = `${p.owner} (${p.phone})`;
                 document.getElementById('inputPatientDistrict').value = p.district || "อำเภอเมืองสุราษฎร์ธานี";
@@ -839,8 +864,11 @@
 
         function savePatient() {
             let editIndex = parseInt(document.getElementById('editPatientIndex').value);
+            let speciesSelect = document.getElementById('inputPatientSpecies').value;
+            let speciesOther = document.getElementById('inputPatientSpeciesOther').value.trim();
+            let finalSpecies = (speciesSelect === 'อื่นๆ') ? (speciesOther || 'อื่นๆ') : speciesSelect;
+
             let name = document.getElementById('inputPatientName').value.trim();
-            let species = document.getElementById('inputPatientSpecies').value;
             let breed = document.getElementById('inputPatientBreed').value.trim();
             let ownerFull = document.getElementById('inputPatientOwner').value.trim();
             let district = document.getElementById('inputPatientDistrict').value;
@@ -864,10 +892,10 @@
                 let newHN = generateNewHN();
                 patients.unshift({
                     hn: newHN,
+                    species: finalSpecies,
                     img: img,
                     idCardImg: idCardImg,
                     name: name,
-                    species: species,
                     breed: breed,
                     owner: ownerName,
                     phone: ownerPhone,
@@ -879,12 +907,12 @@
                     weight: weight,
                     history: []
                 });
-                logActivityToSheet("CREATE_PATIENT", `เพิ่มคนไข้ใหม่ ${name} (${species}/${breed}) เจ้าของ ${ownerName}`, newHN, "เวชระเบียน", "สำเร็จ");
+                logActivityToSheet("CREATE_PATIENT", `เพิ่มคนไข้ใหม่ ${name} (${finalSpecies}/${breed}) เจ้าของ ${ownerName}`, newHN, "เวชระเบียน", "สำเร็จ");
                 alert(`สร้างสมาชิกใหม่สำเร็จ! เลขประจำตัว HN: ${newHN}`);
             } else {
                 let p = patients[editIndex];
+                p.species = finalSpecies;
                 p.name = name;
-                p.species = species;
                 p.breed = breed;
                 p.owner = ownerName;
                 p.phone = ownerPhone;
@@ -1106,7 +1134,7 @@
         function openDoctorLogModal(index) {
             let item = appointments[index];
             document.getElementById('docQueueIndex').value = index;
-            let patient = patients.find(p => p.hn === item.hn) || { name: '-', species: 'สุนัข', breed: '-', owner: '-', phone: '-', district: 'อำเภอเมืองสุราษฎร์ธานี', subdistrict: '', addressDetail: '', hn: item.hn, age: '1 ปี', gender: 'ผู้', weight: '-' };
+            let patient = patients.find(p => p.hn === item.hn) || { name: '-', species: 'สุนัข', breed: '-', owner: '-', phone: '-', district: 'อำเภอเมืองสุราษฎร์ธานี', subdistrict: '', addressDetail: '', hn: item.hn, age: '1 ปี', gender: 'ผู้' };
             let fullAddress = `${patient.addressDetail || ''} ${patient.subdistrict || ''} ${patient.district || ''}`.trim() || 'อำเภอเมืองสุราษฎร์ธานี';
 
             document.getElementById('pOwner').innerText = patient.owner;
@@ -1114,11 +1142,10 @@
             document.getElementById('pPhone').innerText = patient.phone;
             document.getElementById('pAddress').innerText = fullAddress;
             document.getElementById('pHN').innerText = patient.hn;
-            document.getElementById('pWeight').innerText = patient.weight || '-';
             
-            // ตรวจสอบชนิดสัตว์เพื่อแสดงผลติ๊กถูก ☑ ให้ตรงกับข้อมูลที่บันทึกไว้
-            let isDog = (!patient.species || patient.species === "สุนัข");
-            document.getElementById('pSpeciesCheck').innerHTML = isDog ? "☑ สุนัข ☐ แมว" : "☐ สุนัข ☑ แมว";
+            // แสดงชนิดสัตว์ในใบเวชระเบียนแบบไดนามิก (สุนัข, แมว หรือพิมพ์ระบุเอง เช่น กระต่าย)
+            let sp = patient.species || 'สุนัข';
+            document.getElementById('pSpeciesBox').innerText = sp;
 
             document.getElementById('pBreed').innerText = patient.breed;
             document.getElementById('pGender').innerText = patient.gender;
